@@ -81,27 +81,28 @@ const HomePage: React.FC = () => {
     (sum, item) => sum + item.komisi_nominal,
     0
   );
-  console.log(overviewData);
 
   return (
-    <div className="text-white min-h-screen p-6">
+    <div className="bg-gray-100 min-h-screen p-6">
       <div className="grid grid-cols-4 gap-6">
-        <div className="p-4 bg-gray-800 rounded-lg shadow-lg">
+        <div className="p-4 bg-white rounded-lg shadow-lg">
           <h3 className="text-lg font-bold">Total Revenue</h3>
           <p className="text-3xl font-semibold mt-2">
             {totalRevenue.toLocaleString("id-ID", {
               style: "currency",
               currency: "IDR",
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 0,
             })}
           </p>
         </div>
         <Link
           to="/transaction"
-          className="col-span-2 p-4 bg-orange-400 rounded-lg shadow-lg flex items-center justify-center text-xl text-gray-900 font-semibold"
+          className="col-span-2 p-4 bg-orange-400 rounded-lg shadow-lg flex items-center justify-center text-xl text-gray-900 font-bold"
         >
           Mulai Belanja
         </Link>
-        <div className="p-4 bg-gray-800 rounded-lg shadow-lg text-center">
+        <div className="p-4 bg-white rounded-lg shadow-lg text-center">
           <h3 className="text-lg font-bold">Selamat Datang!</h3>
           <p className="text-3xl font-semibold mt-2">{user.username}</p>
         </div>
@@ -109,7 +110,7 @@ const HomePage: React.FC = () => {
 
       {/* Overview */}
       <div className="mt-8">
-        <div className="p-4 bg-gray-800 rounded-lg shadow-lg">
+        <div className="p-4 bg-white rounded-lg shadow-lg">
           <h3 className="text-lg font-bold mb-4">Overview</h3>
           <div className="space-y-6 overflow-y-auto max-h-[500px] scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-800">
             {Object.entries(overviewData).map(([bulan, records]) => (
@@ -120,15 +121,17 @@ const HomePage: React.FC = () => {
                 {records.map((title, index) => (
                   <div
                     key={index}
-                    className="flex justify-between items-center bg-gray-700 p-4 rounded-lg mb-2"
+                    className="flex justify-between items-center bg-gray-100 p-4 rounded-lg mb-2"
                   >
                     <div>
                       <p className="font-semibold">{title.marketing}</p>
-                      <p className="text-sm text-gray-400">
+                      <p className="text-sm text-gray-600">
                         Omzet :{" "}
                         {title.omzet.toLocaleString("id-ID", {
                           style: "currency",
                           currency: "IDR",
+                          minimumFractionDigits: 0,
+                          maximumFractionDigits: 0,
                         })}
                       </p>
                     </div>
@@ -147,7 +150,7 @@ const HomePage: React.FC = () => {
                           maximumFractionDigits: 0,
                         })}
                       </p>
-                      <p className="text-sm text-gray-400">
+                      <p className="text-sm text-gray-600">
                         Komisi : {title.komisi_persen}%
                       </p>
                     </div>
