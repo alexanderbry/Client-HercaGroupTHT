@@ -1,7 +1,20 @@
-import "./App.css";
+import ReactDOM from "react-dom/client";
+import { BrowserRouter, Routes, Route } from "react-router";
+import RegisterPage from "./pages/registerPage";
+import LoginPage from "./pages/LoginPage";
 
-function App() {
-  return <h1 className="text-3xl font-bold underline">Hello world!</h1>;
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+          {/* <Route index element={<Home />} /> */}
+          <Route path="register" element={<RegisterPage />} />
+          <Route path="login" element={<LoginPage />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App;
+const root = ReactDOM.createRoot(document.getElementById('root')!);
+root.render(<App />);
