@@ -1,10 +1,14 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Form from "../components/Form";
+import { useNavigate } from "react-router";
 
 const RegisterPage: React.FC = () => {
-  const handleRegister = (data: { username: string; password: string }) => {
-    console.log("Registering:", data);
-  };
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      navigate("/");
+    }
+  }, []);
 
   return (
     <div className="h-screen flex items-center justify-center bg-gray-100">
@@ -12,7 +16,7 @@ const RegisterPage: React.FC = () => {
         <h2 className="text-center text-2xl font-bold mb-4">
           Create an Account
         </h2>
-        <Form onSubmit={handleRegister} formType="register" />
+        <Form formType="register" />
       </div>
     </div>
   );

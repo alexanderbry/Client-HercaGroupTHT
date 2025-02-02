@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { api } from "../api/api";
 
 interface Product {
   id: number;
@@ -8,11 +9,12 @@ interface Product {
 }
 
 interface MarketingAgent {
-  id: string;
+  id: number;
   name: string;
 }
 
 interface ShippingLocation {
+  id: number;
   name: string;
   address: string;
   cargo_fee: number;
@@ -65,26 +67,28 @@ const productsData: Product[] = [
 
 const marketingAgents: MarketingAgent[] = [
   {
-    id: "1",
+    id: 1,
     name: "Alfandy",
   },
   {
-    id: "2",
+    id: 2,
     name: "Mery",
   },
   {
-    id: "3",
+    id: 3,
     name: "Danang",
   },
 ];
 
 const shippingLocations: ShippingLocation[] = [
   {
+    id: 1,
     name: "Alamat Rumah",
     address: "Jl. Contoh No. 123, Jakarta",
     cargo_fee: 50000,
   },
   {
+    id: 2,
     name: "Alamat Kantor",
     address: "Jl. Bisnis No. 456, Surabaya",
     cargo_fee: 75000,
@@ -117,20 +121,30 @@ const TransactionPage: React.FC = () => {
     return totalProductPrice + cargoFee;
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (!selectedMarketingAgent || !selectedShippingLocation) {
       alert("Silakan pilih Marketing Agent dan Lokasi Pengiriman");
       return;
     }
 
     const checkoutData = {
-      products: cart,
-      marketingAgent: selectedMarketingAgent,
-      shippingLocation: selectedShippingLocation,
-      total: calculateTotal(),
+      marketing_id: selectedMarketingAgent.id,
+      cargo_fee: selectedShippingLocation.cargo_fee,
+      total_balance: calculateTotal(),
     };
+console.log(checkoutData, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 
-    console.log("Checkout Data:", checkoutData);
+    const res = await api.post("/transaction/create", checkoutData,{
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+console.log(res);
+
+    // if (res.status !== 201) {
+    //   alert("Checkout gagal!");
+    // }
+
     alert("Checkout berhasil!");
 
     setCart([]);

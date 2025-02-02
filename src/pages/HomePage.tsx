@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router";
+import { api } from "../api/api";
 
 interface OverviewData {
-  marketing: string;
-  bulan: string;
-  omzet: number;
-  komisi_persen: number;
-  komisi_nominal: number;
+  Marketing: string;
+  Bulan: string;
+  Omzet: number;
+  "Komisi %": number;
+  "Komisi Nominal": number;
 }
 
 interface User {
@@ -14,73 +15,36 @@ interface User {
 }
 
 const HomePage: React.FC = () => {
-  const hardcodedData: OverviewData[] = [
-    {
-      marketing: "Alfandy",
-      bulan: "Januari",
-      omzet: 138000000,
-      komisi_persen: 2.5,
-      komisi_nominal: 3450000,
-    },
-    {
-      marketing: "Mery",
-      bulan: "Januari",
-      omzet: 80000000,
-      komisi_persen: 0,
-      komisi_nominal: 0,
-    },
-    {
-      marketing: "Danang",
-      bulan: "Januari",
-      omzet: 44320000,
-      komisi_persen: 0,
-      komisi_nominal: 0,
-    },
-    {
-      marketing: "Alfandy",
-      bulan: "Februari",
-      omzet: 75000000,
-      komisi_persen: 0,
-      komisi_nominal: 0,
-    },
-    {
-      marketing: "Mery",
-      bulan: "Februari",
-      omzet: 1010020000,
-      komisi_persen: 10,
-      komisi_nominal: 101002100,
-    },
-    {
-      marketing: "Danang",
-      bulan: "Februari",
-      omzet: 205000000,
-      komisi_persen: 5,
-      komisi_nominal: 10250100,
-    },
-  ];
+  const getOverviewData = async () => {
+    try {
+      const res = await api.get("/overview", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      setOverviewData(res.data.data);
+    } catch (error) {
+      alert(error);
+    }
+  };
 
   const user: User = { username: "alexanderbryan" };
 
-  const [overviewData, setOverviewData] = useState<
-    Record<string, OverviewData[]>
-  >(
-    hardcodedData.reduce(
-      (acc: Record<string, OverviewData[]>, item: OverviewData) => {
-        if (!acc[item.bulan]) {
-          acc[item.bulan] = [];
-        }
-        acc[item.bulan].push(item);
-        return acc;
-      },
-      {}
-    )
-  );
+  const [overviewData, setOverviewData] = useState([] as OverviewData[]);
 
-  const totalRevenue = hardcodedData.reduce((sum, item) => sum + item.omzet, 0);
-  const totalCommission = hardcodedData.reduce(
-    (sum, item) => sum + item.komisi_nominal,
-    0
-  );
+  const totalRevenue = overviewData.reduce((sum, item) => sum + item.Omzet, 0);
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
+  useEffect(() => {
+    getOverviewData();
+  }, []);
 
   return (
     <div className="bg-gray-100 min-h-screen p-6">
@@ -113,51 +77,52 @@ const HomePage: React.FC = () => {
         <div className="p-4 bg-white rounded-lg shadow-lg">
           <h3 className="text-lg font-bold mb-4">Overview</h3>
           <div className="space-y-6 overflow-y-auto max-h-[500px] scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-800">
-            {Object.entries(overviewData).map(([bulan, records]) => (
-              <div key={bulan} className="mb-4">
-                <h4 className="text-md font-bold mb-2 border-b border-gray-600 pb-2">
-                  {bulan}
-                </h4>
-                {records.map((title, index) => (
-                  <div
-                    key={index}
-                    className="flex justify-between items-center bg-gray-100 p-4 rounded-lg mb-2"
-                  >
-                    <div>
-                      <p className="font-semibold">{title.marketing}</p>
-                      <p className="text-sm text-gray-600">
-                        Omzet :{" "}
-                        {title.omzet.toLocaleString("id-ID", {
-                          style: "currency",
-                          currency: "IDR",
-                          minimumFractionDigits: 0,
-                          maximumFractionDigits: 0,
-                        })}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p
-                        className={`font-semibold ${
-                          title.komisi_nominal === 0
-                            ? "text-red-500"
-                            : "text-green-500"
-                        }`}
-                      >
-                        {title.komisi_nominal.toLocaleString("id-ID", {
-                          style: "currency",
-                          currency: "IDR",
-                          minimumFractionDigits: 0,
-                          maximumFractionDigits: 0,
-                        })}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        Komisi : {title.komisi_persen}%
-                      </p>
-                    </div>
-                  </div>
-                ))}
+            <div className="w-full p-4">
+              <div className="space-y-6 overflow-y-auto max-h-[500px] scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-800">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Marketing
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Month
+                      </th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Revenue
+                      </th>
+                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Commission Rate
+                      </th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Commission Amount
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {overviewData.map((row, index) => (
+                      <tr key={index} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {row.Marketing}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {row.Bulan}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                          {formatCurrency(row.Omzet)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                          {row["Komisi %"]}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                          {formatCurrency(row["Komisi Nominal"])}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </div>
