@@ -132,18 +132,12 @@ const TransactionPage: React.FC = () => {
       cargo_fee: selectedShippingLocation.cargo_fee,
       total_balance: calculateTotal(),
     };
-console.log(checkoutData, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 
-    const res = await api.post("/transaction/create", checkoutData,{
+    await api.post("/transaction/create", checkoutData,{
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     });
-console.log(res);
-
-    // if (res.status !== 201) {
-    //   alert("Checkout gagal!");
-    // }
 
     alert("Checkout berhasil!");
 
